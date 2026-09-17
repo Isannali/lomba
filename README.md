@@ -2,13 +2,6 @@
 
 Proyek ini dikembangkan untuk perlombaan **Telepati Agridata**. Repositori ini berisi notebook eksperimen, pemrosesan dataset, dan persiapan model *computer vision* serta *object detection*.
 
-## Teknologi
-
-- Python 3.12 atau lebih baru
-- [`uv`](https://docs.astral.sh/uv/) untuk manajemen environment dan dependensi
-- Jupyter Notebook
-- Ultralytics dan OpenCV untuk eksperimen *computer vision*
-
 ## Cara Menjalankan Proyek
 
 ### Prasyarat
