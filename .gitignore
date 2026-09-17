@@ -1,2 +1,26 @@
-/Telepati 8.0 Datasets
-/YOLO_Dataset
+# Virtual Environment
+.venv/
+venv/
+
+# Datasets & Heavy Files
+Telepati 8.0 Datasets/
+images/
+labels/
+*.zip
+*.tar.gz
+
+# Model Output & Weights (YOLO)
+yolo_out/
+runs/
+*.pt
+*.onnx
+*.engine
+
+# Python & Jupyter Cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# System / OS
+.DS_Store
+Thumbs.db
