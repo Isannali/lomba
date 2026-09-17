@@ -55,7 +55,7 @@ Buka repositori ini di VS Code, lalu pilih interpreter atau kernel Python dari e
 contoh:
 ```bash
 DATASET_ROOT = "path/to/your/extracted_dataset"
-YOLO_OUT=""path/to/your/destination"
+YOLO_OUT="path/to/your/destination"
 ```
 
 
