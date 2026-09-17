@@ -47,4 +47,16 @@ powershell -ExecutionPolicy Bypass -c "irm https://astral.sh/uv/install.ps1 | ie
 
 Buka repositori ini di VS Code, lalu pilih interpreter atau kernel Python dari environment `.venv` yang dibuat oleh `uv`.
 
+### Pengaturan Dataset
+1. Unduh dataset lomba terlebih dahulu ke komputer Anda.
+2. Ekstrak file dataset tersebut ke direktori pilihan Anda.
+3. Buka notebook eksperimen (.ipynb) di Jupyter Lab atau VS Code.
+4. Cari variabel DATASET_ROOT dan YOLO_OUT di cell awal notebook, lalu ubah nilainya sesuai lokasi/path folder dataset sesuai dengan Path pada folder anda.
+contoh:
+```bash
+DATASET_ROOT = "path/to/your/extracted_dataset"
+YOLO_OUT=""path/to/your/destination"
+```
+
+
 
