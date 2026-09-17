@@ -27,8 +27,8 @@ powershell -ExecutionPolicy Bypass -c "irm https://astral.sh/uv/install.ps1 | ie
 1. Clone repositori, lalu masuk ke direktorinya:
 
   ```bash
-  git clone https://github.com/USERNAME/NAMA-REPO.git
-  cd NAMA-REPO
+  git clone https://github.com/Isannali/lomba.git
+  cd lomba
   ```
 
 2. Sinkronkan environment dan dependensi:
