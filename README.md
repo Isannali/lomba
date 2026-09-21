@@ -59,6 +59,5 @@ yolo_out = Path(r"path/to/your/destination")
 ```
 5. Jalankan seluruh cell secara berurutan dari atas ke bawah (`Run All`).
 
-D:\lomba\train\train_yolo_26n_p2\
 
 
