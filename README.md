@@ -53,10 +53,12 @@ Buka repositori ini di VS Code, lalu pilih interpreter atau kernel Python dari e
 3. Buka notebook eksperimen (.ipynb) di Jupyter Lab atau VS Code.
 4. Cari variabel DATASET_ROOT dan YOLO_OUT di cell awal notebook, lalu ubah nilainya sesuai lokasi/path folder dataset sesuai dengan Path pada folder anda.
 contoh:
-```bash
-DATASET_ROOT = "path/to/your/extracted_dataset"
-YOLO_OUT="path/to/your/destination"
+```python
+dataset_root = Path(r"path/to/your/extracted_dataset")
+yolo_out = Path(r"path/to/your/destination")
 ```
+5. Jalankan seluruh cell secara berurutan dari atas ke bawah (`Run All`).
 
+D:\lomba\train\train_yolo_26n_p2\
 
 
