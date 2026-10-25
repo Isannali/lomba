@@ -1,0 +1,9 @@
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0+cu128
+ultralytics==8.4.187
+gdown
+matplotlib
+PyYAML
+opencv-python
+jupyterlab
+ipykernel

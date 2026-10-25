@@ -1,163 +1,148 @@
 # Telepati Agridata
 
-Proyek ini menggunakan object detection untuk mengenali kondisi dan penyakit
-tanaman padi. Pipeline eksperimen—mulai dari persiapan data, preprocessing,
-pelatihan, evaluasi, hingga visualisasi prediksi—tersedia di
-[lomba-full-pipeline.ipynb](./lomba-full-pipeline.ipynb).
+## Cara menjalankan
 
-## How to Run
+Notebook [agridata_main.ipynb](./agridata_main.ipynb) dapat dijalankan di Kaggle
+atau lingkungan Jupyter lokal. Jalankan semua sel secara berurutan dari sel
+paling atas sampai akhir. Koneksi internet diperlukan agar notebook dapat
+mengunduh dataset melalui `gdown`. Untuk training dengan waktu yang wajar,
+gunakan GPU yang kompatibel dengan PyTorch CUDA. Eksperimen yang dilaporkan
+menggunakan dua GPU dan memerlukan sekitar 9,2 jam untuk 132 epoch; waktu aktual
+bergantung pada GPU dan lingkungan yang digunakan. Seed training ditetapkan ke
+`42`.
 
-Notebook dapat dijalankan di Kaggle maupun secara lokal (Windows, macOS, atau
-Linux) menggunakan Jupyter Notebook/Lab. Untuk menjalankan lokal, clone atau
-unduh repositori dan jalankan notebook dengan direktori kerja di root
-repositori, yaitu direktori yang berisi notebook dan file `yolo26l_715.pt`.
+Parameter di sel konfigurasi (sel 1 setelah sel instalasi):
 
-```bash
-git clone https://github.com/Isannali/lomba.git
-cd lomba
+- `TRAIN`: `True` menjalankan training; `False` melewati training dan
+  menggunakan bobot yang tersedia.
+- `EPOCHS`: batas maksimum epoch, yaitu `300`; early stopping menghentikan
+  eksperimen yang dilaporkan pada epoch 132.
+- `DEVICE`: notebook memilih seluruh GPU CUDA yang terdeteksi, misalnya `[0, 1]`
+  pada eksperimen dua GPU atau `[0]` pada sistem satu GPU. Jika tidak ada GPU,
+  notebook memilih CPU; training CPU dapat berjalan jauh lebih lambat.
+- `WEIGHTS_OVERRIDE`: path opsional ke file bobot `.pt`. Saat `TRAIN=False`,
+  notebook memeriksa path ini terlebih dahulu sebelum `BEST_WEIGHTS`.
+
+### Evaluasi test atau inferensi dengan bobot rilis
+
+Unduh [yolo26l_best_717.pt dari GitHub
+Releases](https://github.com/Isannali/lomba/releases/download/v1.0.0/yolo26l_best_717.pt)
+ke komputer atau environment tempat notebook berjalan. Letakkan file di root
+repositori, atau sesuaikan path di `WEIGHTS_OVERRIDE`. Contoh:
+
+```python
+TRAIN = False
+WEIGHTS_OVERRIDE = "yolo26l_best_717.pt"
 ```
 
-### 1. Siapkan Python dan environment
+Path relatif dihitung dari direktori kerja notebook. Jalankan sel dari atas
+sampai dan termasuk **Evaluasi** untuk menyiapkan data dan mengukur performa
+bobot pada split test. Lanjutkan ke **Inferensi** untuk melihat prediksi pada
+contoh gambar test.
 
-Gunakan Python 3.10 atau lebih baru. Dari root repositori, buat dan aktifkan
-virtual environment:
+Untuk prediksi pada gambar sendiri tanpa menjalankan evaluasi test, gunakan
+Ultralytics dengan path bobot dan gambar yang sesuai:
 
-**Windows PowerShell**
+```python
+from ultralytics import YOLO
 
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
+model = YOLO("yolo26l_best_717.pt")
+results = model.predict(source="path/to/image.jpg", save=True)
 ```
 
-**macOS/Linux**
+Hasil prediksi disimpan Ultralytics di `runs/detect/predict/` (atau direktori
+bernomor berikutnya jika direktori tersebut sudah ada).
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
+## Dependensi
 
-Install dependensi notebook dan Jupyter:
+Versi runtime dan paket dari log eksperimen:
 
-```bash
-python -m pip install --upgrade pip
-python -m pip install gdown matplotlib ultralytics pandas numpy pillow jupyter ipykernel
-```
+- Python `3.13.15`
+- PyTorch `2.11.0+cu128`
+- Ultralytics `8.4.187`
+- `gdown`
+- `matplotlib`
+- `PyYAML` (`pyyaml`)
+- `opencv-python` (`opencv`)
 
-Jika ingin menggunakan GPU NVIDIA, pastikan driver CUDA pada komputer sesuai
-dengan versi PyTorch yang digunakan. Ikuti petunjuk instalasi PyTorch untuk
-memilih build CUDA yang cocok bagi sistem Anda. Notebook dapat dijalankan pada
-CPU dengan mengganti `device=[0,1]` menjadi `device="cpu"`, tetapi training
-YOLO26-L dapat berjalan sangat lambat. Untuk satu GPU, gunakan `device=0`;
-sesuaikan `batch` jika memori GPU tidak mencukupi.
+Sel instalasi notebook mengunci Ultralytics ke `ultralytics==8.4.187`.
+PyTorch perlu dipasang dengan build yang sesuai dengan sistem operasi, driver,
+dan GPU yang digunakan. Pada lingkungan yang mendukung file requirements
+repositori, dependensi proyek juga tercantum di
+[`requirements.txt`](./requirements.txt).
 
-### 2. Sesuaikan path di notebook
-
-Notebook awalnya memakai beberapa lokasi khusus Kaggle. Sebelum menjalankan
-secara lokal, buka `lomba-full-pipeline.ipynb` dan sesuaikan **semua** path
-berikut:
-
-| Path di notebook | Ganti dengan |
-| --- | --- |
-| `/kaggle/working/...` | Path absolut ke root repositori lokal, misalnya `/home/nama/lomba/...` atau `C:/Users/Nama/lomba/...` |
-| `/kaggle/input/models/rajasatricahya/yolo26l-715/pytorch/default/1/yolo26l_715.pt` | Path weights lokal, misalnya `yolo26l_715.pt` jika notebook dijalankan dari root repositori |
-
-Path `/kaggle/working` digunakan pada cell preprocessing, pembuatan
-`dataset.yaml`, training, dan evaluasi. Ganti bagian prefix-nya secara
-konsisten; contoh, `/kaggle/working/Dataset_Telepati` menjadi
-`/home/nama/lomba/Dataset_Telepati`. Cell-cell yang memakai path relatif seperti
-`dataset.zip`, `dataset_raw/`, dan `Dataset_Telepati/` mengasumsikan direktori
-kerja notebook adalah root repositori. Jangan ubah hanya beberapa path karena
-cell berikutnya bergantung pada lokasi keluaran cell sebelumnya.
-
-Satu cell pemeriksaan label juga berisi nama file contoh yang spesifik pada
-dataset. Jika file tersebut tidak ditemukan pada dataset Anda, ubah
-`label_file` di cell itu ke file `.txt` yang benar di
-`Dataset_Telepati/labels/train/`, atau lewati cell pemeriksaan tersebut.
-
-### 3. Jalankan notebook
-
-Pastikan virtual environment masih aktif, lalu mulai Jupyter dari root
-repositori:
-
-```bash
-jupyter lab
-```
-
-Buka `lomba-full-pipeline.ipynb`, pilih kernel dari virtual environment `.venv`,
-dan jalankan cell dari atas ke bawah (`Run All`). Notebook akan mengunduh
-`dataset.zip` dari Google Drive, mengekstraknya ke `dataset_raw/`, memproses
-anotasi, membuat struktur dataset YOLO di `Dataset_Telepati/`, lalu melatih dan
-mengevaluasi model. Jika sistem tidak menyediakan perintah `unzip` (misalnya
-Windows tanpa utilitas tersebut), unduh dataset secara manual, ekstrak ke
-`dataset_raw/`, lalu lewati cell unduh dan ekstrak (`gdown` dan `unzip`) dan
-mulai dari cell preprocessing.
-
-Weights yang disertakan di repositori digunakan oleh cell inferensi. Sementara
-itu, cell evaluasi menggunakan `runs/detect/train/weights/best.pt`, yaitu
-weights yang baru dibuat oleh proses training. Jalankan cell training terlebih
-dahulu sebelum evaluasi; untuk hanya melakukan inferensi, pastikan cell
-inferensi menunjuk ke file weights lokal dan dataset test sudah tersedia.
-
-## Dependencies
-
-Notebook memerlukan paket-paket berikut:
-
-```bash
-python -m pip install gdown matplotlib ultralytics pandas numpy pillow jupyter ipykernel
-```
-
-Dependensi yang digunakan:
-
-- `ultralytics` — training, evaluasi, konversi anotasi COCO, dan inferensi YOLO.
-- `gdown` — mengunduh arsip dataset dari Google Drive.
-- `matplotlib` — visualisasi distribusi kelas dan hasil prediksi.
-- `pandas`, `numpy`, `pillow` — pengolahan data dan gambar.
-- `opencv-python` dan `PyYAML` — pemrosesan gambar serta pembacaan konfigurasi
-  dataset; keduanya digunakan oleh notebook dan tersedia sebagai dependensi
-  Ultralytics.
-- Python standard library (`json`, `pathlib`, `shutil`, dan `collections`).
-
-Training memerlukan PyTorch. Ultralytics memasang dependensi PyTorch yang
-diperlukan; untuk GPU NVIDIA, gunakan instalasi PyTorch dengan dukungan CUDA
-yang sesuai dengan driver dan perangkat keras lokal.
+## Arsitektur model
 
 ## Arsitektur Model
 
-- **Model:** Ultralytics YOLO26-L, dibuat dari konfigurasi `yolo26l.yaml`.
-- **Tugas:** deteksi objek dengan bounding box.
-- **Inisialisasi training:** `pretrained=False`; model training dimulai dari
-  konfigurasi, bukan dari weights pralatih.
-- **Jumlah kelas:** 11 kelas penyakit/kondisi padi:
-  `bacterial_leaf_blight`, `bacterial_panicle_blight`, `blast`, `brown_spot`,
-  `false_smut`, `healthy`, `leaf_roller`, `leaf_scald`, `narrow_brown`,
-  `sheath_blight`, dan `tungro`.
+Model yang digunakan adalah **YOLO26l** (Ultralytics), detektor objek satu tahap, yang dibangun dari
+`yolo26l.yaml` dan **dilatih dari nol tanpa bobot pretrained** (`pretrained=False`).
+
+- Konfigurasi arsitektur: [`yolo26.yaml`](https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/models/26/yolo26.yaml)
+  (ukuran `l` dipilih lewat faktor skala `[depth 1,0 ; width 1,0 ; max channel 512]`)
+- Dokumentasi model: https://docs.ultralytics.com/models/yolo26/
+- Rancangan: end-to-end (`end2end: True`), tanpa DFL (`reg_max: 1`), tiga skala keluaran P3/8, P4/16, P5/32
+- Input 640 x 640, jumlah kelas 11 (kelas canonical lomba)
+- Ukuran model (setelah layer digabung/fused, 11 kelas): **188 layer, 24.754.221 parameter, 86,5 GFLOPs**
+- Versi library: Ultralytics 8.4.187, torch 2.11.0+cu128, Python 3.13.15
+
+| No | Modul | Ulang | Kanal | Keterangan |
+|---|---|---|---|---|
+| 0 | Conv (k3, s2) | 1 | 64 | P1/2 |
+| 1 | Conv (k3, s2) | 1 | 128 | P2/4 |
+| 2 | C3k2 | 2 | 256 | |
+| 3 | Conv (k3, s2) | 1 | 256 | P3/8 |
+| 4 | C3k2 | 2 | 512 | |
+| 5 | Conv (k3, s2) | 1 | 512 | P4/16 |
+| 6 | C3k2 (c3k=True) | 2 | 512 | |
+| 7 | Conv (k3, s2) | 1 | 512 | P5/32 |
+| 8 | C3k2 (c3k=True) | 2 | 512 | |
+| 9 | SPPF (k5) | 1 | 512 | |
+| 10 | C2PSA | 2 | 512 | blok atensi (akhir backbone) |
+| 11 | Upsample x2 | 1 | - | head |
+| 12 | Concat dengan layer 6 | 1 | - | |
+| 13 | C3k2 (c3k=True) | 2 | 512 | |
+| 14 | Upsample x2 | 1 | - | |
+| 15 | Concat dengan layer 4 | 1 | - | |
+| 16 | C3k2 (c3k=True) | 2 | 256 | keluaran P3/8 (objek kecil) |
+| 17 | Conv (k3, s2) | 1 | 256 | |
+| 18 | Concat dengan layer 13 | 1 | - | |
+| 19 | C3k2 (c3k=True) | 2 | 512 | keluaran P4/16 (objek sedang) |
+| 20 | Conv (k3, s2) | 1 | 512 | |
+| 21 | Concat dengan layer 10 | 1 | - | |
+| 22 | C3k2 (c3k=True, e=0,5, attn=True) | 1 | 512 | keluaran P5/32 (objek besar) |
+| 23 | Detect (layer 16, 19, 22) | 1 | - | 11 kelas |
 
 ## Hyperparameter
 
-Nilai berikut mengikuti pemanggilan `model.train()` di notebook:
+Nilai berikut digunakan pada sel training:
 
 | Parameter | Nilai |
-| --- | --- |
-| `epochs` | `300` |
-| `imgsz` | `640` |
-| `batch` | `32` |
-| `device` | `[0, 1]` (ubah sesuai perangkat lokal) |
+| --- | ---: |
+| `epochs` | 300 (early stopping pada epoch 132; hasil terbaik epoch 102) |
+| `imgsz` | 640 |
+| `batch` | 32 |
+| `device` | `[0, 1]` pada eksperimen |
+| `patience` | 30 |
+| `seed` | 42 |
+| `hsv_h` | 0,01 |
+| `hsv_s` | 0,4 |
+| `hsv_v` | 0,4 |
+| `erasing` | 0,2 |
+| `fliplr` | 0,3 |
+| `flipud` | 0,3 |
+| `mosaic` | 0,7 |
 | `pretrained` | `False` |
-| `hsv_h` | `0.01` |
-| `hsv_s` | `0.4` |
-| `hsv_v` | `0.4` |
-| `erasing` | `0.2` |
-| `fliplr` | `0.3` |
-| `flipud` | `0.0` |
-| `mosaic` | `0.7` |
-| `patience` | `30` |
 
-Training menggunakan early stopping dengan `patience=30`. Evaluasi dijalankan
-pada split `test` dengan ukuran gambar `640`.
+Parameter lain menggunakan nilai bawaan Ultralytics 8.4.187. Skor mandiri pada
+split test: **mAP50 0,7166** dan **F1 0,7252** (precision 0,730; recall 0,721).
+F1 dihitung sebagai rata-rata harmonik precision dan recall:
+`2 × P × R / (P + R)`.
 
-## Model Weights
+## Tautan bobot model
 
-- **Weights yang disertakan:** [yolo26l_715.pt](./yolo26l_715.pt)
-- **Sumber model di Kaggle:** [yolo26l-715](https://www.kaggle.com/models/rajasatricahya/yolo26l-715)
-- **Weights hasil training notebook:** `runs/detect/train/weights/best.pt`.
-  File ini dihasilkan setelah training dan berbeda dari `yolo26l_715.pt`.
+Bobot model: [`yolo26l_best_717.pt` (GitHub Release
+v1.0.0)](https://github.com/Isannali/lomba/releases/download/v1.0.0/yolo26l_best_717.pt).
+Unduh file tersebut langsung ke lingkungan yang menjalankan notebook, lalu
+atur `WEIGHTS_OVERRIDE` ke lokasi file seperti contoh pada bagian **Cara
+menjalankan**.
