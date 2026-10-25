@@ -71,8 +71,6 @@ dan GPU yang digunakan. Pada lingkungan yang mendukung file requirements
 repositori, dependensi proyek juga tercantum di
 [`requirements.txt`](./requirements.txt).
 
-## Arsitektur model
-
 ## Arsitektur Model
 
 Model yang digunakan adalah **YOLO26l** (Ultralytics), detektor objek satu tahap, yang dibangun dari
