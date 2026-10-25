@@ -26,7 +26,7 @@ Parameter di sel konfigurasi (sel 1 setelah sel instalasi):
 ### Evaluasi test atau inferensi dengan bobot rilis
 
 Unduh [yolo26l_best_717.pt dari GitHub
-Releases](https://github.com/Isannali/lomba/releases/download/v1.0.0/yolo26l_best_717.pt)
+Releases](https://github.com/Isannali/lomba/releases/tag/v1.0/yolo26l_best_717.pt)
 ke komputer atau environment tempat notebook berjalan. Letakkan file di root
 repositori, atau sesuaikan path di `WEIGHTS_OVERRIDE`. Contoh:
 
@@ -142,7 +142,7 @@ F1 dihitung sebagai rata-rata harmonik precision dan recall:
 ## Tautan bobot model
 
 Bobot model: [`yolo26l_best_717.pt` (GitHub Release
-v1.0.0)](https://github.com/Isannali/lomba/releases/download/v1.0.0/yolo26l_best_717.pt).
+v1.0.0)](https://github.com/Isannali/lomba/releases/tag/v1.0/yolo26l_best_717.pt).
 Unduh file tersebut langsung ke lingkungan yang menjalankan notebook, lalu
 atur `WEIGHTS_OVERRIDE` ke lokasi file seperti contoh pada bagian **Cara
 menjalankan**.
